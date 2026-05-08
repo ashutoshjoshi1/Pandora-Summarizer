@@ -1,0 +1,32 @@
+instrument:
+  id: Pan100
+  timezone: America/Denver
+
+paths:
+  l0_dir: D:\Pandora\L0
+  l1_out_dir: D:\Pandora\L1
+  alignment_dir: D:\Pandora\Alignment
+  blick_figures_dir: C:\Program Files\Blick\Figures
+  blickp_exe: C:\Program Files\Blick\BlickP.exe
+
+schedule:
+  run_time_local: "02:00"
+  process_lookback_days: 1
+
+gcs:
+  bucket: pgn-pandora-daily
+  service_account_json: C:\ProgramData\PandoraSummarizer\sa.json
+  overwrite_existing: true
+
+retry:
+  max_attempts: 3
+  backoff_seconds: [30, 120, 600]
+
+logging:
+  dir: C:\ProgramData\PandoraSummarizer\logs
+  level: INFO
+  rotate_mb: 25
+  keep_files: 14
+
+state:
+  db_path: C:\ProgramData\PandoraSummarizer\state.db
