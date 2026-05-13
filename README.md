@@ -39,31 +39,43 @@ docs/                                     Runbook, troubleshooting, deployment.
 
 ## Quick start
 
+### On a Pandora computer (field install)
+
+The complete, non-technical walkthrough for someone visiting a Pandora
+computer with a USB stick is **[`INSTALL-ON-PANDORA.md`](INSTALL-ON-PANDORA.md)**.
+A one-page printable checklist is **[`FIELD-CHECKLIST.txt`](FIELD-CHECKLIST.txt)**.
+
+Short version:
+
+1. Copy this entire folder onto the Pandora computer.
+2. Install Python 3.11+ from python.org (tick "Add python.exe to PATH").
+3. Drop the GCS service-account key at
+   `C:\ProgramData\PandoraFleetMonitor\sa.json`.
+4. Double-click **`Run-Setup.bat`** and accept the UAC prompt.
+5. Edit `config.yaml` when Notepad opens, save, close.
+6. Double-click **`Run-Pandora-Now.bat`** to test.
+
+For on-demand runs after install, double-click `Run-Pandora-Now.bat`. To
+uninstall, double-click `Run-Uninstall.bat`.
+
+### Manual / dev install
+
 ```bash
-# 1. install
 python -m venv .venv
 .venv\Scripts\activate          # Windows
 pip install -e ".[dev]"
 
-# 2. copy + edit config
-copy config\config.example.yaml config\config.yaml
-notepad config\config.yaml
+cp config/config.example.yaml config/config.yaml
+edit config/config.yaml
 
-# 3. validate
-pandora-edge validate-config --config config\config.yaml
-
-# 4. run once (yesterday's date, no upload)
-pandora-edge run --config config\config.yaml --dry-run
-
-# 5. run + upload
-pandora-edge run --config config\config.yaml
-
-# 6. install daily scheduled task at 06:00 local
-pandora-edge install-task --config config\config.yaml
+pandora-edge validate-config --config config/config.yaml
+pandora-edge run --config config/config.yaml --dry-run
+pandora-edge run --config config/config.yaml
+pandora-edge install-task --config config/config.yaml
 ```
 
-See [`docs/deployment.md`](docs/deployment.md) for Windows service deployment
-and [`docs/runbook.md`](docs/runbook.md) for daily operations.
+See [`docs/deployment.md`](docs/deployment.md) for the full deployment
+reference and [`docs/runbook.md`](docs/runbook.md) for daily operations.
 
 ## CLI
 

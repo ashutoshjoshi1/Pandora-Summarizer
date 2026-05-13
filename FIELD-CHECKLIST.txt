@@ -1,0 +1,79 @@
+================================================================
+  PANDORA FLEET MONITORING - FIELD INSTALLATION CHECKLIST
+  Print this. One per Pandora computer.
+================================================================
+
+Pandora ID:   ______________________   (e.g. Pandora024)
+Location:     ______________________   (e.g. GSFC)
+Time zone:    ______________________   (e.g. America/New_York)
+GCS bucket:   ______________________   (from team lead)
+Installer's name + date: __________________________________
+
+
+Things to bring
+---------------
+[  ]  This USB stick with the Pandora-Summarizer folder.
+[  ]  The sa.json service-account key from the team lead.
+[  ]  This printed checklist.
+
+
+On the Pandora computer
+-----------------------
+
+[  ] 1. Install Python 3.11+ from python.org.
+        IMPORTANT: tick "Add python.exe to PATH" at the bottom of
+        the first installer screen.
+
+        Verify: open Command Prompt, type
+            python --version
+        Expect: "Python 3.x.x"
+
+[  ] 2. Copy the Pandora-Summarizer folder from USB to:
+            C:\Users\Public\Pandora-Summarizer
+
+[  ] 3. Create the folder
+            C:\ProgramData\PandoraFleetMonitor
+        (it may already exist; that's fine)
+        Copy sa.json into it. The final path must be:
+            C:\ProgramData\PandoraFleetMonitor\sa.json
+
+[  ] 4. Double-click Run-Setup.bat
+        Click "Yes" on the UAC admin prompt.
+
+[  ] 5. When Notepad opens config.yaml, fill in:
+        - instrument.id           : ______________________
+        - instrument.display_name : ______________________
+        - instrument.location_name: ______________________
+        - instrument.timezone     : ______________________
+        - gcs.bucket              : ______________________
+        - paths.*  (only if Blick is NOT installed at C:\Blick)
+        Save (Ctrl+S), close Notepad.
+
+[  ] 6. Wait for the installer to print:
+            *** Installer finished. ***
+        Press any key to close.
+
+[  ] 7. Double-click Run-Pandora-Now.bat
+        Wait for it to finish. Look for:
+            status=COMPLETED  (best)
+            status=PARTIAL    (acceptable on day-one fresh installs)
+            status=FAILED     (BAD - call team lead)
+
+[  ] 8. Open Task Scheduler (Windows key, type "Task Scheduler").
+        Confirm "PandoraEdgeService" appears in the library.
+        Status: Ready, Next Run Time: tomorrow at the chosen time.
+
+[  ] 9. Notify team lead:
+        "<Pandora ID> installed at <Location> on <date>."
+
+
+If anything fails
+-----------------
+- Re-run Run-Setup.bat. It is safe to run again.
+- Copy the entire PowerShell output into a text file or photograph it.
+- Also collect:
+        C:\ProgramData\PandoraFleetMonitor\logs\pandora-edge.log
+- Send both to the team lead before leaving the site.
+
+
+================================================================
