@@ -94,33 +94,44 @@ def cmd_uninstall_task(_args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="pandora-edge")
+    # Shared parent so --config works both before and after the subcommand,
+    # e.g. `pandora-edge --config X run` and `pandora-edge run --config X`.
+    # Use SUPPRESS so the subparser doesn't overwrite a value passed to the
+    # top-level parser (and vice versa); we apply the real default after parsing.
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--config", help="Path to config.yaml",
+                        default=argparse.SUPPRESS)
+
+    parser = argparse.ArgumentParser(prog="pandora-edge", parents=[common])
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    parser.add_argument("--config", help="Path to config.yaml",
-                        default="config/config.yaml")
 
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    p_run = sub.add_parser("run", help="Run the pipeline for one day")
+    p_run = sub.add_parser("run", parents=[common],
+                           help="Run the pipeline for one day")
     p_run.add_argument("--date", type=_parse_date,
                        help="Target date (YYYY-MM-DD); defaults to yesterday.")
     p_run.add_argument("--dry-run", action="store_true",
                        help="Process but do not upload to GCS.")
     p_run.set_defaults(func=cmd_run)
 
-    p_bf = sub.add_parser("backfill", help="Run the pipeline across a date range")
+    p_bf = sub.add_parser("backfill", parents=[common],
+                          help="Run the pipeline across a date range")
     p_bf.add_argument("--start", type=_parse_date, required=True)
     p_bf.add_argument("--end", type=_parse_date, required=True)
     p_bf.add_argument("--dry-run", action="store_true")
     p_bf.set_defaults(func=cmd_backfill)
 
-    p_v = sub.add_parser("validate-config", help="Validate the YAML config")
+    p_v = sub.add_parser("validate-config", parents=[common],
+                         help="Validate the YAML config")
     p_v.set_defaults(func=cmd_validate_config)
 
-    p_i = sub.add_parser("install-task", help="Create the Windows scheduled task")
+    p_i = sub.add_parser("install-task", parents=[common],
+                         help="Create the Windows scheduled task")
     p_i.set_defaults(func=cmd_install_task)
 
-    p_u = sub.add_parser("uninstall-task", help="Remove the Windows scheduled task")
+    p_u = sub.add_parser("uninstall-task", parents=[common],
+                         help="Remove the Windows scheduled task")
     p_u.set_defaults(func=cmd_uninstall_task)
 
     return parser
@@ -129,6 +140,8 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if not getattr(args, "config", None):
+        args.config = "config/config.yaml"
     try:
         return int(args.func(args))
     except FileNotFoundError as e:
