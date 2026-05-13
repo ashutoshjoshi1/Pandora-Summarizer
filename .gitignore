@@ -7,7 +7,9 @@ dist/
 .venv/
 venv/
 .env
+.env.*
 .coverage
+htmlcov/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -15,3 +17,14 @@ venv/
 *.db-journal
 logs/
 .DS_Store
+
+# Local config + secrets (never commit)
+config/config.yaml
+config/*.local.yaml
+**/sa.json
+**/service-account*.json
+**/credentials.json
+
+# Local state
+state.db*
+data/staging/

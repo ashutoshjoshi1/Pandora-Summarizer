@@ -1,0 +1,28 @@
+{% macro pill(value, kind='neutral') -%}
+  <span class="pill pill-{{ kind|lower }} pill-{{ value|lower|replace(' ', '-') }}">
+    {{ value }}
+  </span>
+{%- endmacro %}
+
+{% macro health_pill(rec) -%}
+  <span class="pill pill-health pill-{{ rec.health_label|lower }}">
+    <span class="pill-score">{{ rec.health_score }}</span>
+    <span class="pill-label">{{ rec.health_label }}</span>
+  </span>
+{%- endmacro %}
+
+{% macro online_pill(value) -%}
+  {{ pill(value, 'online') }}
+{%- endmacro %}
+
+{% macro alignment_pill(value) -%}
+  {{ pill(value or 'UNKNOWN', 'alignment') }}
+{%- endmacro %}
+
+{% macro upload_pill(value) -%}
+  {{ pill(value or 'UNKNOWN', 'upload') }}
+{%- endmacro %}
+
+{% macro file_pill(value) -%}
+  {{ pill(value or 'UNKNOWN', 'file') }}
+{%- endmacro %}

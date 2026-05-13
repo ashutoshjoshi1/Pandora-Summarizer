@@ -1,0 +1,234 @@
+{
+  "schema_version": "2.0",
+  "instrument_id": "Pandora024",
+  "target_date": "2026-05-12",
+  "generated_at_utc": "2026-05-13T18:43:14.696680Z",
+  "host": {
+    "hostname": "Mac",
+    "os": "Darwin 25.3.0",
+    "service_version": "0.2.0",
+    "blick_version": null,
+    "display_name": "Pandora024",
+    "location_name": "GSFC",
+    "timezone": "America/New_York"
+  },
+  "status": {
+    "online_status": "ONLINE",
+    "last_seen_utc": "2026-05-13T18:33:14.682587Z",
+    "last_log_received_utc": "2026-05-12T10:01:00Z",
+    "last_file_received_utc": "2026-05-13T18:33:14.682587Z",
+    "offline_reason": null,
+    "missing_expected_files": []
+  },
+  "operation": {
+    "mode": "SCHEDULE",
+    "current_schedule": "uv_sun.sked",
+    "current_routine": "SO",
+    "last_routine": "SO",
+    "last_started_schedule": "uv_sun.sked",
+    "last_started_routine": "SO",
+    "last_successful_measurement_utc": "2026-05-12T23:55:00Z",
+    "first_measurement_utc": "2026-05-12T12:00:00Z",
+    "measurement_count": 1,
+    "l0_file_count": 1,
+    "partial_l0_file_count": 1,
+    "routines_observed": [
+      "SO"
+    ],
+    "l0_status": "PRESENT"
+  },
+  "logs": {
+    "total_warning_count": 1,
+    "total_error_count": 0,
+    "repeated_warnings": [],
+    "critical_errors": [],
+    "warning_summary": "1 warnings across 1 unique messages.",
+    "error_summary": "No critical errors found.",
+    "first_warning_utc": "2026-05-12T10:01:00Z",
+    "last_warning_utc": "2026-05-12T10:01:00Z",
+    "first_error_utc": null,
+    "last_error_utc": null
+  },
+  "tracker": {
+    "tracker_connected": true,
+    "tracker_reset_count": 0,
+    "last_tracker_reset_utc": null,
+    "tracker_health": "GOOD"
+  },
+  "sun_search": {
+    "last_sun_search_utc": "2026-05-12T23:55:00Z",
+    "sun_search_status": "SUCCESS",
+    "failed_sun_search_count": 0,
+    "rms": 0.02,
+    "offset": 0.01,
+    "fwhm": 0.5,
+    "pointing_azimuth": null,
+    "pointing_zenith": null
+  },
+  "alignment": {
+    "alignment_file_found": true,
+    "last_alignment_utc": "2026-05-12T16:10:00Z",
+    "latest_scan_type": "FS",
+    "latest_weighting_factor": 1459.5,
+    "latest_rms": 0.026,
+    "scan_count": 1,
+    "good_scan_count": 1,
+    "bad_scan_count": 0,
+    "alignment_health": "GOOD",
+    "alignment_comment": "Scans are good."
+  },
+  "files": {
+    "l0": {
+      "status": "PRESENT",
+      "files": [
+        {
+          "filename": "Pandora024_L0_20260512.txt",
+          "size_bytes": 221,
+          "sha256": "663c72441579eea483b4e0b3de4f2d1b3604b7577fbf05d320affb1f65e90f0e",
+          "modified_utc": "2026-05-13T18:33:14.682587Z"
+        }
+      ],
+      "total_bytes": 221
+    },
+    "partial_l0": {
+      "status": "PRESENT",
+      "files": [
+        {
+          "filename": "Pandora024_partial_20260512.txt",
+          "size_bytes": 80,
+          "sha256": "d64fa5de561fe2be266c3720d041cc501f71d795120954015271192ba3ea3742",
+          "modified_utc": "2026-05-13T18:33:14.682587Z"
+        }
+      ],
+      "total_bytes": 80
+    },
+    "logs": {
+      "status": "PRESENT",
+      "oslog": {
+        "status": "PRESENT",
+        "files": [
+          {
+            "filename": "oslog_20260512.txt",
+            "size_bytes": 89,
+            "sha256": "0b163c80f6e2a91306b2a7073c645e59b0d59f37fa870a552f9270440df677c2",
+            "modified_utc": "2026-05-13T18:33:14.682587Z"
+          }
+        ],
+        "total_bytes": 89
+      },
+      "fslog": {
+        "status": "PRESENT",
+        "files": [
+          {
+            "filename": "fslog_20260512.txt",
+            "size_bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "modified_utc": "2026-05-13T18:33:14.682587Z"
+          }
+        ],
+        "total_bytes": 0
+      },
+      "pslog": {
+        "status": "PRESENT",
+        "files": [
+          {
+            "filename": "pslog_20260512.txt",
+            "size_bytes": 39,
+            "sha256": "a209b286d8452ded88a99fc047521fd25491bbcc1d202ad8a97533be28d50a57",
+            "modified_utc": "2026-05-13T18:33:14.682587Z"
+          }
+        ],
+        "total_bytes": 39
+      }
+    },
+    "alignment": {
+      "status": "PRESENT",
+      "files": [
+        {
+          "filename": "alignment_20260512.txt",
+          "size_bytes": 75,
+          "sha256": "3bb14e5e35fa6ee14d44265a3610b0b42bf6e537191175cca3f64d9ab66135b6",
+          "modified_utc": "2026-05-13T18:33:14.682587Z"
+        }
+      ],
+      "total_bytes": 75
+    },
+    "figures": {
+      "status": "UNKNOWN",
+      "files": [],
+      "total_bytes": 0,
+      "count": 0
+    },
+    "skipped_unstable": []
+  },
+  "upload": {
+    "upload_status": "COMPLETED",
+    "gcs_prefix": "pandora-fleet-monitoring/Pandora024/2026-05-12",
+    "uploaded_objects_count": 6,
+    "uploaded_bytes": 504,
+    "failed_uploads": [],
+    "retry_count": 0,
+    "upload_started_at_utc": "2026-05-13T18:43:14.695982Z",
+    "upload_finished_at_utc": "2026-05-13T18:43:14.696679Z"
+  },
+  "health": {
+    "daily_health_score": 100,
+    "daily_health_label": "GREEN",
+    "score_breakdown": {
+      "base": 100,
+      "offline_penalty": 0,
+      "missing_l0_penalty": 0,
+      "warnings_penalty": 0,
+      "errors_penalty": 0,
+      "alignment_penalty": 0,
+      "tracker_penalty": 0,
+      "sun_search_penalty": 0,
+      "upload_penalty": 0
+    },
+    "summary": "Pandora024 score 100 (GREEN). 1 warning(s) in logs. Alignment is good."
+  },
+  "service_status": {
+    "overall": "COMPLETED",
+    "attempt": 1,
+    "duration_seconds": 0,
+    "steps": [
+      {
+        "name": "locate_files",
+        "status": "OK",
+        "duration_ms": 0,
+        "error": null
+      },
+      {
+        "name": "parse_l0_status",
+        "status": "OK",
+        "duration_ms": 0,
+        "error": null
+      },
+      {
+        "name": "parse_logs",
+        "status": "OK",
+        "duration_ms": 0,
+        "error": null
+      },
+      {
+        "name": "parse_alignment",
+        "status": "OK",
+        "duration_ms": 0,
+        "error": null
+      },
+      {
+        "name": "stage_bundle",
+        "status": "OK",
+        "duration_ms": 0,
+        "error": null
+      },
+      {
+        "name": "upload_data",
+        "status": "OK",
+        "duration_ms": 0,
+        "error": null
+      }
+    ],
+    "errors": []
+  }
+}

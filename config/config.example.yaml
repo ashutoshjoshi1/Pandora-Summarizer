@@ -1,32 +1,60 @@
+# Pandora Fleet Monitoring - Edge Service config.
+# Copy to config.yaml and edit. config.yaml is gitignored.
+
 instrument:
-  id: Pan100
-  timezone: America/Denver
+  id: Pandora024
+  display_name: Pandora024
+  location_name: GSFC
+  timezone: America/New_York
 
 paths:
-  l0_dir: D:\Pandora\L0
-  l1_out_dir: D:\Pandora\L1
-  alignment_dir: D:\Pandora\Alignment
-  blick_figures_dir: C:\Program Files\Blick\Figures
-  blickp_exe: C:\Program Files\Blick\BlickP.exe
-
-schedule:
-  run_time_local: "02:00"
-  process_lookback_days: 1
+  blick_root: C:\Blick
+  l0_dir: C:\Blick\data\L0
+  tmp_dir: C:\Blick\data\tmp
+  alignment_dir: C:\Blick\data\alignments
+  oslog_dir: C:\Blick\log\oslog
+  fslog_dir: C:\Blick\log\fslog
+  pslog_dir: C:\Blick\log\pslog
+  figures_dir: C:\Blick\data\alignments\figures
+  config_dir: C:\Blick\config
+  operationfiles_dir: C:\Blick\data\operationfiles
+  routines_dir: C:\Blick\lib\routines
+  schedules_dir: C:\Blick\lib\schedules
 
 gcs:
-  bucket: pgn-pandora-daily
-  service_account_json: C:\ProgramData\PandoraSummarizer\sa.json
+  bucket: log_web
+  prefix: pandora-fleet-monitoring
+  service_account_json: C:\ProgramData\PandoraFleetMonitor\sa.json
   overwrite_existing: true
 
-retry:
-  max_attempts: 3
-  backoff_seconds: [30, 120, 600]
+service:
+  run_time_local: "06:00"
+  process_lookback_days: 1
+  retry_attempts: 3
+  upload_l0_files: true
+  upload_partial_l0_files: true
+  upload_logs: true
+  upload_alignment_files: true
+  upload_figures: true
+  # Skip files whose mtime is within this window (Blick may still be writing).
+  file_stability_seconds: 60
+
+health_thresholds:
+  offline_hours_threshold: 24
+  warning_count_yellow: 5
+  warning_count_red: 20
+  error_count_yellow: 1
+  error_count_red: 5
+  alignment_weighting_min_good: 500
+  failed_sun_search_red: 3
+  tracker_reset_red: 3
 
 logging:
-  dir: C:\ProgramData\PandoraSummarizer\logs
+  dir: C:\ProgramData\PandoraFleetMonitor\logs
   level: INFO
   rotate_mb: 25
   keep_files: 14
 
 state:
-  db_path: C:\ProgramData\PandoraSummarizer\state.db
+  db_path: C:\ProgramData\PandoraFleetMonitor\state.db
+  staging_dir: C:\ProgramData\PandoraFleetMonitor\staging

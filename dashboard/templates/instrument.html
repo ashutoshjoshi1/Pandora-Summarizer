@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% from "_macros.html" import health_pill, online_pill, alignment_pill, upload_pill, file_pill %}
+{% block title %}{{ instrument_id }} · Detail{% endblock %}
+
+{% block content %}
+<section class="detail-header">
+  <div>
+    <p class="kicker">Instrument</p>
+    <h1>{{ instrument_id }}</h1>
+    {% if record.display_name and record.display_name != instrument_id %}
+      <p class="dim">{{ record.display_name }}</p>
+    {% endif %}
+    <p class="dim small">
+      {{ record.location_name or 'unknown location' }} ·
+      {{ record.timezone or 'unknown tz' }}
+    </p>
+  </div>
+  <div class="detail-headline-stats">
+    {{ health_pill(record) }}
+    {{ online_pill(record.online_status) }}
+    {{ upload_pill(record.upload_status) }}
+  </div>
+</section>
+
+<section class="bento">
+  <div class="card span-2">
+    <h2>Status · {{ record.target_date }}</h2>
+    <dl class="kv">
+      <dt>Last log UTC</dt><dd><code>{{ record.last_log_received_utc or '—' }}</code></dd>
+      <dt>Last file UTC</dt><dd><code>{{ record.last_file_received_utc or '—' }}</code></dd>
+      <dt>Last measurement</dt><dd><code>{{ record.last_successful_measurement_utc or '—' }}</code></dd>
+      <dt>Mode</dt><dd>{{ record.mode or '—' }}</dd>
+      <dt>Schedule</dt><dd>{{ record.current_schedule or '—' }}</dd>
+      <dt>Routine</dt><dd>{{ record.current_routine or '—' }}</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h2>Logs</h2>
+    <p class="big-stat {{ 'flag' if record.warning_count else '' }}">
+      {{ record.warning_count }} <span>warnings</span>
+    </p>
+    <p class="big-stat {{ 'flag-red' if record.error_count else '' }}">
+      {{ record.error_count }} <span>errors</span>
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Tracker</h2>
+    {{ online_pill(record.tracker_health) }}
+  </div>
+
+  <div class="card">
+    <h2>Sun search</h2>
+    <p class="dim">{{ record.sun_search_status or '—' }}</p>
+  </div>
+
+  <div class="card">
+    <h2>Alignment</h2>
+    {{ alignment_pill(record.alignment_health) }}
+    {% if record.alignment_weighting is not none %}
+      <p class="dim">weighting <code>{{ '%.1f'|format(record.alignment_weighting) }}</code></p>
+    {% endif %}
+    {% if record.alignment_comment %}
+      <p class="small">{{ record.alignment_comment }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Files</h2>
+    <p>L0 {{ file_pill(record.l0_status) }}</p>
+    <p>Partial L0 {{ file_pill(record.partial_l0_status) }}</p>
+  </div>
+
+  <div class="card">
+    <h2>Upload</h2>
+    {{ upload_pill(record.upload_status) }}
+    <p class="dim small">
+      {{ record.upload_objects }} object(s) ·
+      {{ (record.upload_bytes / 1024.0) | round(1) }} KB
+    </p>
+  </div>
+</section>
+
+{% if trend %}
+<section class="trend">
+  <h2>Last {{ trend|length }} day(s)</h2>
+  <div class="table-wrap">
+    <table class="data-table compact">
+      <thead>
+        <tr>
+          <th>Date</th><th>Score</th><th>Health</th><th>Online</th>
+          <th class="num">Warn</th><th class="num">Err</th>
+          <th>Alignment</th><th>L0</th><th>Upload</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for t in trend %}
+        <tr>
+          <td><a href="{{ url_for('instrument.detail_for_date', instrument_id=instrument_id, date_iso=t.date) }}"><code>{{ t.date }}</code></a></td>
+          <td class="num">{{ t.score }}</td>
+          <td><span class="pill pill-health pill-{{ t.label|lower }}">{{ t.label }}</span></td>
+          <td><span class="pill pill-online pill-{{ t.online|lower }}">{{ t.online }}</span></td>
+          <td class="num {{ 'flag' if t.warnings else '' }}">{{ t.warnings }}</td>
+          <td class="num {{ 'flag-red' if t.errors else '' }}">{{ t.errors }}</td>
+          <td><span class="pill pill-alignment pill-{{ t.alignment|lower }}">{{ t.alignment }}</span></td>
+          <td><span class="pill pill-file pill-{{ t.l0_status|lower }}">{{ t.l0_status }}</span></td>
+          <td><span class="pill pill-upload pill-{{ t.upload|lower }}">{{ t.upload }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<details class="raw-viewer">
+  <summary>Raw summary.json</summary>
+  <pre><code>{{ record.raw | tojson(indent=2) }}</code></pre>
+</details>
+{% endblock %}

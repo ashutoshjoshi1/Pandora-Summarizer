@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Daily report · {{ target_date }}{% endblock %}
+
+{% block content %}
+<section class="overview-header">
+  <div class="overview-title">
+    <p class="kicker">Daily report</p>
+    <h1>{{ target_date }}</h1>
+  </div>
+  <form method="get" class="filters inline">
+    <input type="date" name="date" value="{{ target_date }}">
+    <button type="submit">Load</button>
+  </form>
+</section>
+
+<section class="report-grid">
+  <div class="card big">
+    <p class="big-num">{{ snap.units_online | length }}</p>
+    <p>Online</p>
+  </div>
+  <div class="card big red">
+    <p class="big-num">{{ snap.units_offline | length }}</p>
+    <p>Offline</p>
+  </div>
+  {% set hc = snap.by_health_label %}
+  <div class="card big green">
+    <p class="big-num">{{ hc.get('GREEN', 0) }}</p>
+    <p>GREEN</p>
+  </div>
+  <div class="card big yellow">
+    <p class="big-num">{{ hc.get('YELLOW', 0) }}</p>
+    <p>YELLOW</p>
+  </div>
+  <div class="card big red">
+    <p class="big-num">{{ hc.get('RED', 0) }}</p>
+    <p>RED</p>
+  </div>
+  <div class="card big gray">
+    <p class="big-num">{{ hc.get('GRAY', 0) }}</p>
+    <p>GRAY</p>
+  </div>
+</section>
+
+<section class="report-lists">
+  <div class="card">
+    <h2>Units with critical errors</h2>
+    {% if snap.units_with_critical_errors %}
+      <ul>
+        {% for r in snap.units_with_critical_errors %}
+          <li>
+            <a href="{{ url_for('instrument.detail', instrument_id=r.instrument_id) }}">{{ r.instrument_id }}</a>
+            · <span class="dim">{{ r.error_count }} error(s)</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="dim">None.</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Units missing L0 / status data</h2>
+    {% if snap.units_with_missing_l0 %}
+      <ul>
+        {% for r in snap.units_with_missing_l0 %}
+          <li>
+            <a href="{{ url_for('instrument.detail', instrument_id=r.instrument_id) }}">{{ r.instrument_id }}</a>
+            · <span class="dim">L0 {{ r.l0_status }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="dim">None.</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Units with bad alignment</h2>
+    {% if snap.units_with_bad_alignment %}
+      <ul>
+        {% for r in snap.units_with_bad_alignment %}
+          <li>
+            <a href="{{ url_for('instrument.detail', instrument_id=r.instrument_id) }}">{{ r.instrument_id }}</a>
+            · <span class="dim">{{ r.alignment_health }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="dim">None.</p>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Units with failed upload</h2>
+    {% if snap.units_with_failed_upload %}
+      <ul>
+        {% for r in snap.units_with_failed_upload %}
+          <li>
+            <a href="{{ url_for('instrument.detail', instrument_id=r.instrument_id) }}">{{ r.instrument_id }}</a>
+            · <span class="dim">{{ r.upload_status }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="dim">None.</p>{% endif %}
+  </div>
+</section>
+{% endblock %}

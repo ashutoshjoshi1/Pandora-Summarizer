@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pandora-summarizer"
-version = "0.1.0"
-description = "Daily uploader for Pandora instrument data products to GCS"
+name = "pandora-fleet-monitor"
+version = "0.2.0"
+description = "Edge service + read-only web dashboard for Pandora instrument fleet monitoring"
 requires-python = ">=3.11"
 authors = [{ name = "PGN Operations" }]
 dependencies = [
@@ -13,6 +13,7 @@ dependencies = [
     "pyyaml>=6.0",
     "google-cloud-storage>=2.16",
     "tenacity>=8.2",
+    "flask>=3.0",
 ]
 
 [project.optional-dependencies]
@@ -23,16 +24,26 @@ dev = [
     "mypy>=1.10",
     "types-PyYAML",
 ]
+windows = [
+    "pywin32>=306; sys_platform == 'win32'",
+]
 
 [project.scripts]
-pandora-summarizer = "pandora_summarizer.__main__:main"
+pandora-edge = "pandora_edge.__main__:main"
+pandora-dashboard = "dashboard.app:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["edge_service", "."]
+include = ["pandora_edge*", "dashboard*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    "unit: unit tests",
+    "integration: integration tests",
+]
+pythonpath = ["edge_service", "."]
 
 [tool.ruff]
 line-length = 100
@@ -44,4 +55,4 @@ select = ["E", "F", "W", "I", "B", "UP"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src"]
+files = ["edge_service", "dashboard"]

@@ -1,36 +1,134 @@
-# Pandora Summarizer
+# Pandora Fleet Monitoring Platform
 
-Daily uploader for Pandora instrument data products (L0, L1, alignment, figures, summary) to Google Cloud Storage. See [DESIGN.md](DESIGN.md) for full architecture.
+Edge-heavy monitoring for a fleet of Pandora spectral measurement instruments.
 
-## Status
+- **Edge service** runs on each Pandora computer (Windows). It reads Blick L0,
+  partial-L0/status files, oslog / fslog / pslog, alignment files, and figures
+  **locally**, builds a daily `summary.json` with online status, warning /
+  error rollups, alignment health, tracker health, and a 0–100 health score,
+  then uploads to Google Cloud Storage.
+- **GCS** is a passive storage layer. No cloud compute.
+- **Dashboard** (Flask + Jinja, read-only) reads `summary.json` files from GCS
+  and renders fleet overview, per-instrument detail, and daily reports.
 
-M1 — skeleton, config, local state DB, orchestrator, stubbed steps. Not yet runnable end-to-end against a real Pandora instrument.
+L1, L2Fit, and L2 files are **not** part of this workflow and are not produced,
+parsed, uploaded, or displayed anywhere.
 
-## Quick start (dev)
+## Repo layout
+
+```
+config/config.example.yaml                Edge config (copy to config.yaml).
+edge_service/pandora_edge/                The edge service package.
+  cli.py                                  pandora-edge CLI.
+  orchestrator.py                         Never-crash pipeline.
+  config.py                               Pydantic schema.
+  parsers/                                L0, status-line, log, alignment, file inventory.
+  health/                                 Rules + scoring.
+  steps/                                  Pipeline steps.
+  gcs/uploader.py                         GCS uploader with retry.
+  service/                                Windows install / uninstall scripts.
+dashboard/                                Flask app reading summaries from GCS.
+  app.py
+  config.py
+  services/                               gcs_reader, summary_loader, fleet_aggregator.
+  routes/                                 fleet / instrument / reports / export.
+  templates/, static/
+tests/                                    Unit + dashboard tests.
+docs/                                     Runbook, troubleshooting, deployment.
+```
+
+## Quick start
 
 ```bash
+# 1. install
 python -m venv .venv
-. .venv/bin/activate            # Windows: .venv\Scripts\activate
+.venv\Scripts\activate          # Windows
 pip install -e ".[dev]"
-cp config/config.example.yaml config/config.yaml
-pandora-summarizer run --date 2026-05-07 --config config/config.yaml --dry-run
-pytest
+
+# 2. copy + edit config
+copy config\config.example.yaml config\config.yaml
+notepad config\config.yaml
+
+# 3. validate
+pandora-edge validate-config --config config\config.yaml
+
+# 4. run once (yesterday's date, no upload)
+pandora-edge run --config config\config.yaml --dry-run
+
+# 5. run + upload
+pandora-edge run --config config\config.yaml
+
+# 6. install daily scheduled task at 06:00 local
+pandora-edge install-task --config config\config.yaml
 ```
+
+See [`docs/deployment.md`](docs/deployment.md) for Windows service deployment
+and [`docs/runbook.md`](docs/runbook.md) for daily operations.
 
 ## CLI
 
 ```
-pandora-summarizer run [--date YYYY-MM-DD] [--config PATH] [--dry-run]
-pandora-summarizer status [--config PATH]
+pandora-edge run --date YYYY-MM-DD [--dry-run]
+pandora-edge backfill --start YYYY-MM-DD --end YYYY-MM-DD [--dry-run]
+pandora-edge validate-config
+pandora-edge install-task
+pandora-edge uninstall-task
 ```
 
-`--date` defaults to yesterday in the configured instrument timezone.
-`--dry-run` runs the orchestrator without invoking BlickP or uploading to GCS.
+If `--date` is omitted, the target date is `today - process_lookback_days`
+(default: yesterday).
 
-## Layout
+## GCS layout
 
-See [DESIGN.md §9](DESIGN.md#9-repository--service-structure).
+```
+gs://<bucket>/pandora-fleet-monitoring/<instrument_id>/<YYYY-MM-DD>/
+  summary.json
+  manifest.json
+  data/
+    l0/...
+    partial_l0/...
+    alignment/...
+    logs/
+      oslog/...
+      fslog/...
+      pslog/...
+    figures/...
+```
 
-## Operations
+There are no `l1/`, `l2fit/`, or `l2/` folders by design.
 
-- [Windows installation & operations guide](docs/windows-service-guide.md) — install, schedule, monitor, troubleshoot.
+## Dashboard
+
+```bash
+# environment-driven configuration
+set PANDORA_DASH_BUCKET=log_web
+set PANDORA_DASH_PREFIX=pandora-fleet-monitoring
+set PANDORA_DASH_SA_JSON=C:\ProgramData\PandoraFleetMonitor\dashboard-sa.json
+
+python -m dashboard.app
+# or:
+pandora-dashboard
+```
+
+For local development without GCS, point the dashboard at a directory of
+fixtures with the same layout:
+
+```bash
+set PANDORA_DASH_FIXTURES_DIR=C:\dev\summaries
+```
+
+See [`docs/runbook.md`](docs/runbook.md) and the example summary at
+[`docs/examples/summary.json`](docs/examples/summary.json).
+
+## Tests
+
+```bash
+pytest -q                                          # full suite
+pytest tests/edge_service/test_smoke.py            # full pipeline smoke test
+pytest tests/dashboard                             # dashboard only
+pytest --cov=edge_service --cov=dashboard          # coverage
+```
+
+## License
+
+Internal / not released. See repository owner.
