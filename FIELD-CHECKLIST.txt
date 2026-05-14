@@ -49,21 +49,26 @@ On the Pandora computer
         - paths.*  (only if Blick is NOT installed at C:\Blick)
         Save (Ctrl+S), close Notepad.
 
-[  ] 6. Wait for the installer to print:
+[  ] 6. The installer will backfill every day from 2026-01-01
+        through yesterday. On a fresh PC this can take a long
+        time (often several hours - leave the window open).
+        Days already uploaded are skipped on re-runs.
+
+[  ] 7. Wait for the installer to print:
             *** Installer finished. ***
         Press any key to close.
 
-[  ] 7. Double-click Run-Pandora-Now.bat
+[  ] 8. Double-click Run-Pandora-Now.bat
         Wait for it to finish. Look for:
             status=COMPLETED  (best)
             status=PARTIAL    (acceptable on day-one fresh installs)
             status=FAILED     (BAD - call team lead)
 
-[  ] 8. Open Task Scheduler (Windows key, type "Task Scheduler").
+[  ] 9. Open Task Scheduler (Windows key, type "Task Scheduler").
         Confirm "PandoraEdgeService" appears in the library.
         Status: Ready, Next Run Time: tomorrow at the chosen time.
 
-[  ] 9. Notify team lead:
+[  ] 10. Notify team lead:
         "<Pandora ID> installed at <Location> on <date>."
 
 

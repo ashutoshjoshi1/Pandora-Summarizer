@@ -122,6 +122,22 @@ Close the black window.
 
    Just watch and let it run.
 
+> **Heads up on first install:** the installer will backfill every day
+> from **2026-01-01** through yesterday. On a fresh Pandora this can
+> take a long time (often several hours, depending on file sizes and
+> internet speed). Leave the window open until it prints
+> *"Installer finished."* If you close it partway, just re-run
+> `Run-Setup.bat` — days that already uploaded are skipped.
+>
+> If you need a different start date, run the installer from an admin
+> PowerShell instead:
+>
+> ```powershell
+> .\setup.ps1 -BackfillStart 2026-03-01
+> ```
+>
+> Use `-SkipBackfill` to skip the historical sweep entirely.
+
 ### When the installer pauses to open Notepad
 
 The installer will open `config.yaml` in Notepad. **Edit these fields**

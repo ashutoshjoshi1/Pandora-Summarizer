@@ -11,8 +11,11 @@
 #      and opens it in Notepad so you can edit instrument id, paths, GCS bucket.
 #   5. Verifies the GCS service-account JSON is in place and locks down its ACL.
 #   6. Validates the config and runs a dry-run end-to-end test.
-#   7. Registers the daily Scheduled Task ("PandoraEdgeService").
-#   8. Prints a summary of what was created and how to verify it.
+#   7. Backfills every day from -BackfillStart (default 2026-01-01) through
+#      yesterday's local date. Days already completed in state.db are skipped,
+#      so re-running setup.ps1 is cheap.
+#   8. Registers the daily Scheduled Task ("PandoraEdgeService").
+#   9. Prints a summary of what was created and how to verify it.
 #
 # This script is idempotent. You can rerun it after editing config.yaml.
 
@@ -21,7 +24,9 @@ param(
     [string]$InstallRoot   = "C:\ProgramData\PandoraFleetMonitor",
     [string]$PythonExe     = "",     # empty = autodetect
     [string]$RunTime       = "",     # empty = read from config.yaml
+    [string]$BackfillStart = "2026-01-01",
     [switch]$SkipDryRun,
+    [switch]$SkipBackfill,
     [switch]$SkipTaskInstall
 )
 
@@ -197,6 +202,31 @@ if (-not $SkipDryRun) {
 }
 
 # ---------------------------------------------------------------------------
+if (-not $SkipBackfill) {
+    Step "Backfill historical days from $BackfillStart through yesterday"
+    # Sanity-check the start date.
+    try { $startDate = [datetime]::ParseExact($BackfillStart, "yyyy-MM-dd", $null) }
+    catch { Fail "Invalid -BackfillStart '$BackfillStart'. Use YYYY-MM-DD." }
+
+    $endDate = (Get-Date).Date.AddDays(-1)
+    if ($endDate -lt $startDate) {
+        Warn "Yesterday ($($endDate.ToString('yyyy-MM-dd'))) is before $BackfillStart - nothing to backfill."
+    } else {
+        $endStr = $endDate.ToString("yyyy-MM-dd")
+        Info "Range: $BackfillStart .. $endStr (already-completed days are skipped via state.db)."
+        Info "This can take a while on a fresh install - leave the window open."
+        & $venvPandora backfill --config $configPath --start $BackfillStart --end $endStr
+        if ($LASTEXITCODE -ne 0) {
+            Warn "Backfill exited with code $LASTEXITCODE. Some days failed - inspect:"
+            Warn "    $logsDir\pandora-edge.log"
+            Warn "Re-run setup.ps1 (or 'pandora-edge backfill ...') to retry; finished days are skipped."
+        } else {
+            Ok "Backfill complete through $endStr."
+        }
+    }
+}
+
+# ---------------------------------------------------------------------------
 if (-not $SkipTaskInstall) {
     Step "Register daily Scheduled Task 'PandoraEdgeService'"
     # If -RunTime was not provided, read it from config.yaml (best effort).
@@ -241,6 +271,7 @@ $summary = @"
     Python (venv) ... $venvPython
     CLI ............. $venvPandora
     Scheduled task .. PandoraEdgeService (Task Scheduler)
+    Backfill from ... $BackfillStart (override with -BackfillStart YYYY-MM-DD)
 
     Verify:
         schtasks /Query /TN PandoraEdgeService /V /FO LIST
